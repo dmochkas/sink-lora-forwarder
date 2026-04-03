@@ -1,6 +1,7 @@
 #include "sink_lora_forwarder/services/lora_service.h"
 
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <termios.h>
@@ -20,6 +21,8 @@ static int         g_lora_fd  = -1;
 static const char *g_port     = NULL;
 static int32_t     g_baud     = -1;
 static uint8_t     g_fport    = 10;
+/* MOCK: temporary test-only flag - remove with mock blocks below */
+static bool        g_mock     = false;
 
 void lora_service_set_port(const char *port) {
     g_port = port;
@@ -95,6 +98,14 @@ lora_init_status lora_service_init(void)
         return LORA_INIT_ERROR;
     }
 
+    /* MOCK: if lora-port is "mock", skip real UART - remove when hardware is available */
+    if (strcmp(g_port, "mock") == 0) {
+        g_mock = true;
+        zlog_info(ok_cat, "LoRa MOCK: mock mode active, no UART opened");
+        return LORA_INIT_OK;
+    }
+    /* END MOCK */
+
     g_lora_fd = open_uart(g_port, g_baud);
     if (g_lora_fd < 0) {
         zlog_error(error_cat, "LoRa: failed to open UART %s", g_port);
@@ -167,7 +178,7 @@ static int read_at_response(int fd, char *buf, size_t cap, int total_timeout_ms)
 
 lora_send_status lora_service_forward(const uint8_t *buf, size_t len)
 {
-    if (g_lora_fd < 0) {
+    if (!g_mock && g_lora_fd < 0) {
         zlog_error(error_cat, "LoRa: not initialized");
         return LORA_SEND_ERROR;
     }
@@ -197,6 +208,13 @@ lora_send_status lora_service_forward(const uint8_t *buf, size_t len)
     }
 
     zlog_info(rx_cat, "LoRa TX: AT+SEND=%u:<schc len=%zu>", (unsigned)g_fport, len);
+
+    /* MOCK: log command instead of writing to UART - remove when hardware is available */
+    if (g_mock) {
+        zlog_info(ok_cat, "LoRa MOCK TX: %s", cmd);
+        return LORA_SEND_OK;
+    }
+    /* END MOCK */
 
     tcflush(g_lora_fd, TCIOFLUSH);
 

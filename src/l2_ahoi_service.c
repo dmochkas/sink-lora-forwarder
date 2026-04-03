@@ -12,8 +12,18 @@ static const char* port = NULL;
 static int32_t baudrate = -1;
 static uint8_t modem_id = 0x00;
 static uint32_t modem_id_32 = 0x00;
+/* MOCK: temporary test-only flag - remove with mock blocks below */
+static bool g_mock = false;
 
 l2_init_status l2_init(void) {
+    /* MOCK: if port is "mock", skip real hardware - remove when hardware is available */
+    if (port && strcmp(port, "mock") == 0) {
+        g_mock = true;
+        zlog_info(ok_cat, "AHOI MOCK: mock mode active, no serial port opened");
+        return L2_INIT_OK;
+    }
+    /* END MOCK */
+
     g_ahoi_fd = open_serial_port((const uint8_t*)port, baudrate);
     if (g_ahoi_fd == -1) {
         zlog_error(error_cat, "Error opening serial port");
@@ -54,6 +64,23 @@ void l2_recv_prepare(const void* params) {
 l2_recv_status l2_recv_run(uint8_t* payload, const size_t cap, size_t* out_len) {
     if (!payload || !out_len) return L2_RECV_KO;
     *out_len = 0;
+
+    /* MOCK: return fixed payload once, then timeout - remove when hardware is available */
+    if (g_mock) {
+        static bool mock_sent = false;
+        if (!mock_sent) {
+            static const uint8_t mock_payload[] = {0x11, 0x22, 0x33, 0xAA, 0x55};
+            const size_t mock_len = sizeof(mock_payload);
+            if (mock_len > cap) return L2_RECV_KO;
+            memcpy(payload, mock_payload, mock_len);
+            *out_len = mock_len;
+            mock_sent = true;
+            zlog_info(ok_cat, "AHOI MOCK: injecting fixed payload");
+            return L2_RECV_OK;
+        }
+        return L2_RECV_TIMEOUT;
+    }
+    /* END MOCK */
 
     ahoi_packet_t p = {0};
     ahoi_footer_t f = {0};
