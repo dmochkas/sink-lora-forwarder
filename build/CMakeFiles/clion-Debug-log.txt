@@ -1,0 +1,5 @@
+/home/joako/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug --preset conan-debug -S /home/joako/sink-lora-forwarder -B /home/joako/sink-lora-forwarder/build
+CMake Error: No such preset in /home/joako/sink-lora-forwarder: "conan-debug"
+Available configure presets:
+
+  "conan-release" - 'conan-release' config

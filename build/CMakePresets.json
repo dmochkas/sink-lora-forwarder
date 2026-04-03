@@ -1,0 +1,45 @@
+{
+    "version": 3,
+    "vendor": {
+        "conan": {}
+    },
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 15,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "conan-release",
+            "displayName": "'conan-release' config",
+            "description": "'conan-release' configure using 'Unix Makefiles' generator",
+            "generator": "Unix Makefiles",
+            "cacheVariables": {
+                "CMAKE_POLICY_DEFAULT_CMP0091": "NEW",
+                "CMAKE_BUILD_TYPE": "Release"
+            },
+            "toolchainFile": "conan_toolchain.cmake",
+            "binaryDir": "/home/joako/sink-lora-forwarder/build"
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "conan-release",
+            "configurePreset": "conan-release",
+            "jobs": 4
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "conan-release",
+            "configurePreset": "conan-release",
+            "execution": {
+                "jobs": 4
+            },
+            "environment": {
+                "LD_LIBRARY_PATH": "/home/joako/.conan2/p/b/ahoi-68efb783e6fc1/p/lib:/home/joako/.conan2/p/b/asconef8fc08ff9594/p/lib:$penv{LD_LIBRARY_PATH}",
+                "DYLD_LIBRARY_PATH": "/home/joako/.conan2/p/b/ahoi-68efb783e6fc1/p/lib:/home/joako/.conan2/p/b/asconef8fc08ff9594/p/lib:$penv{DYLD_LIBRARY_PATH}"
+            }
+        }
+    ]
+}

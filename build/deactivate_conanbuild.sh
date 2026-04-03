@@ -1,0 +1,1 @@
+. "/home/joako/sink-lora-forwarder/build/deactivate_conanbuildenv-release-x86_64.sh"
