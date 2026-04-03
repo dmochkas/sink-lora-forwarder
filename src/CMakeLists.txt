@@ -50,7 +50,7 @@ target_include_directories(${LORA_SERVICE} PRIVATE
         "${PROJECT_SOURCE_DIR}/include/sink_lora_forwarder"
         "${PROJECT_SOURCE_DIR}/include/sink_lora_forwarder/services"
 )
-target_link_libraries(${LORA_SERVICE} PRIVATE ${AHOI_SERIAL_LIB} ${ZLOG_LIB})
+target_link_libraries(${LORA_SERVICE} PRIVATE ${ZLOG_LIB})
 
 # ---------------------------------------------------------------------------
 # Executable

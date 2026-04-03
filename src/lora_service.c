@@ -51,7 +51,7 @@ static speed_t baud_to_flag(int32_t baud)
 /* Open and configure a UART port using POSIX termios */
 static int open_uart(const char *path, int32_t baud)
 {
-    const int fd = open(path, O_RDWR | O_NOCTTY | O_NDELAY);
+    const int fd = open(path, O_RDWR | O_NOCTTY | O_SYNC);
     if (fd < 0) return -1;
 
     struct termios tty;
@@ -90,9 +90,14 @@ static int open_uart(const char *path, int32_t baud)
 
 lora_init_status lora_service_init(void)
 {
+    if (!g_port) {
+        zlog_error(error_cat, "LoRa: port not set");
+        return LORA_INIT_ERROR;
+    }
+
     g_lora_fd = open_uart(g_port, g_baud);
     if (g_lora_fd < 0) {
-        zlog_error(error_cat, "LoRa: failed to open UART %s", g_port ? g_port : "(null)");
+        zlog_error(error_cat, "LoRa: failed to open UART %s", g_port);
         return LORA_INIT_ERROR;
     }
     zlog_info(ok_cat, "LoRa: opened %s fport=%u", g_port, (unsigned)g_fport);
@@ -162,6 +167,11 @@ static int read_at_response(int fd, char *buf, size_t cap, int total_timeout_ms)
 
 lora_send_status lora_service_forward(const uint8_t *buf, size_t len)
 {
+    if (g_lora_fd < 0) {
+        zlog_error(error_cat, "LoRa: not initialized");
+        return LORA_SEND_ERROR;
+    }
+
     if (!buf || len == 0) {
         zlog_error(error_cat, "LoRa: empty payload, skipping");
         return LORA_SEND_ERROR;
