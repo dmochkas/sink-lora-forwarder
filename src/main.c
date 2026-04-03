@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <termios.h>
 
 #include "sink_lora_forwarder/logger_helper.h"
@@ -86,7 +87,6 @@ int main(int argc, char *argv[])
         const l2_recv_status r = l2_recv_run(rx_buf, sizeof(rx_buf), &rx_len);
 
         if (r == L2_RECV_TIMEOUT) {
-            zlog_debug(ok_cat, "RX timeout (no packet)");
             continue;
         }
 
@@ -96,5 +96,14 @@ int main(int argc, char *argv[])
         }
 
         forward_one_frame(rx_buf, rx_len);
+
+        /* MOCK: exit cleanly after one full cycle in full mock mode - remove when hardware is available */
+        if (strcmp(port, "mock") == 0 && strcmp(lora_port, "mock") == 0) {
+            zlog_info(ok_cat, "MOCK: full mock cycle complete, exiting");
+            lora_service_close();
+            zlog_fini();
+            return EXIT_SUCCESS;
+        }
+        /* END MOCK */
     }
 }
