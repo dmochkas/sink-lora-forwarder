@@ -17,7 +17,6 @@ l2_init_status l2_init(void) {
     g_ahoi_fd = open_serial_port((const uint8_t*)port, baudrate);
     if (g_ahoi_fd == -1) {
         zlog_error(error_cat, "Error opening serial port");
-        zlog_fini();
         return L2_INIT_ERROR;
     }
 
