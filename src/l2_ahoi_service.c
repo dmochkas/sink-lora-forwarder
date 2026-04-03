@@ -1,5 +1,5 @@
 #include "sink_lora_forwarder/l2/l2.h"
-
+#include <stdbool.h>
 #include <string.h>
 #include <termios.h>
 
