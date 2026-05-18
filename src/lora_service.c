@@ -237,7 +237,7 @@ lora_send_status lora_service_forward(const uint8_t *buf, size_t len)
         return LORA_SEND_ERROR;
     }
 
-    zlog_info(rx_cat, "LoRa raw response len=%d: [%s]", rsp_len, rsp);
+    zlog_info(ok_cat, "LoRa raw response len=%d: [%s]", rsp_len, rsp);
 
     if (strstr(rsp, "OK") != NULL) {
         zlog_info(ok_cat, "LoRa: AT+SEND OK");
