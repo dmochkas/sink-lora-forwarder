@@ -69,7 +69,7 @@ l2_recv_status l2_recv_run(uint8_t* payload, const size_t cap, size_t* out_len) 
     if (g_mock) {
         static bool mock_sent = false;
         if (!mock_sent) {
-            static const uint8_t mock_payload[] = {0x11, 0x22, 0x33, 0xAA, 0x55};
+            static const uint8_t mock_payload[] = { 0x1c, 0x1e, 0xe3, 0xcf, 0xa4, 0x0c,0xea, 0x1f, 0x54, 0x01, 0x10};
             const size_t mock_len = sizeof(mock_payload);
             if (mock_len > cap) return L2_RECV_KO;
             memcpy(payload, mock_payload, mock_len);
